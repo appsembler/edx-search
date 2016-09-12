@@ -97,8 +97,8 @@ def course_discovery_search(search_term=None, size=20, from_=0, field_dictionary
         exclude_dictionary=exclude_dictionary,
         facet_terms=course_discovery_facets(),
     )
-    if not from_ > 0:
-        for result in results["results"]:
+    for result in results["results"]:
+        if not from_ > 0:
             if not CourseDiscoveryResultProcessor.process_result(result["data"], search_term, None):
                 # update facets and stats after the results proccesing
                 results["total"] = int(results["total"]) - 1
@@ -117,9 +117,9 @@ def course_discovery_search(search_term=None, size=20, from_=0, field_dictionary
                             else:
                                 del results["facets"][f]["terms"][result["data"][f]]
 
-            result["data"] = CourseDiscoveryResultProcessor.process_result(result["data"], search_term, None)
+        result["data"] = CourseDiscoveryResultProcessor.process_result(result["data"], search_term, None)
 
-        results["access_denied_count"] = len([r for r in results["results"] if r["data"] is None])
-        results["results"] = [r for r in results["results"] if r["data"] is not None]
+    results["access_denied_count"] = len([r for r in results["results"] if r["data"] is None])
+    results["results"] = [r for r in results["results"] if r["data"] is not None]
 
     return results

@@ -97,25 +97,24 @@ def course_discovery_search(search_term=None, size=20, from_=0, field_dictionary
         exclude_dictionary=exclude_dictionary,
         facet_terms=course_discovery_facets(),
     )
-    for result in results["results"]:
-        if not from_ > 0:
-            if not CourseDiscoveryResultProcessor.process_result(result["data"], search_term, None):
-                # update facets and stats after the results proccesing
-                results["total"] = int(results["total"]) - 1
-                for f in course_discovery_facets():
-                    if f in result["data"]:
-                        if type(result["data"][f]) is list:
-                            for t in result["data"][f]:
-                                if int(results["facets"][f]["terms"][t]):
-                                    results["facets"][f]["terms"][t] = int(results["facets"][f]["terms"][t]) - 1
-                                else:
-                                    del results["facets"][f]["terms"][t]
-                        else:
-                            print results["facets"][f]["terms"][result["data"][f]]
-                            if int(results["facets"][f]["terms"][result["data"][f]]) > 1:
-                                results["facets"][f]["terms"][result["data"][f]] = int(results["facets"][f]["terms"][result["data"][f]]) - 1
+    for result in results["results"]:    
+        if not CourseDiscoveryResultProcessor.process_result(result["data"], search_term, None):
+            # update facets and stats after the results proccesing
+            results["total"] = int(results["total"]) - 1
+            for f in course_discovery_facets():
+                if f in result["data"]:
+                    if type(result["data"][f]) is list:
+                        for t in result["data"][f]:
+                            if int(results["facets"][f]["terms"][t]):
+                                results["facets"][f]["terms"][t] = int(results["facets"][f]["terms"][t]) - 1
                             else:
-                                del results["facets"][f]["terms"][result["data"][f]]
+                                del results["facets"][f]["terms"][t]
+                    else:
+                        print results["facets"][f]["terms"][result["data"][f]]
+                        if int(results["facets"][f]["terms"][result["data"][f]]) > 1:
+                            results["facets"][f]["terms"][result["data"][f]] = int(results["facets"][f]["terms"][result["data"][f]]) - 1
+                        else:
+                            del results["facets"][f]["terms"][result["data"][f]]
 
         result["data"] = CourseDiscoveryResultProcessor.process_result(result["data"], search_term, None)
 

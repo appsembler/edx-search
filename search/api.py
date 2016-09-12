@@ -110,10 +110,13 @@ def course_discovery_search(search_term=None, size=20, from_=0, field_dictionary
                             else:
                                 del results["facets"][f]["terms"][t]
                     else:
-                        if int(results["facets"][f]["terms"][result["data"][f]]) > 1:
-                            results["facets"][f]["terms"][result["data"][f]] = int(results["facets"][f]["terms"][result["data"][f]]) - 1
-                        else:
-                            del results["facets"][f]["terms"][result["data"][f]]
+                        try:
+                            if int(results["facets"][f]["terms"][result["data"][f]]) > 1:
+                                results["facets"][f]["terms"][result["data"][f]] = int(results["facets"][f]["terms"][result["data"][f]]) - 1
+                            else:
+                                del results["facets"][f]["terms"][result["data"][f]]
+                        except KeyError:
+                            pass
 
         result["data"] = CourseDiscoveryResultProcessor.process_result(result["data"], search_term, None)
 

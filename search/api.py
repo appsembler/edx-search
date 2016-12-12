@@ -65,14 +65,14 @@ def perform_search(
     return results
 
 
-def course_discovery_search(search_term=None, size=20, from_=0, field_dictionary=None):
+def course_discovery_search(search_term=None, user=None, size=20, from_=0, field_dictionary=None):
     """
     Course Discovery activities against the search engine index of course details
     """
     # We'll ignore the course-enrollemnt informaiton in field and filter
     # dictionary, and use our own logic upon enrollment dates for these
     use_search_fields = ["org"]
-    (search_fields, _, exclude_dictionary) = SearchFilterGenerator.generate_field_filters()
+    (search_fields, _, exclude_dictionary, content_groups_filter) = SearchFilterGenerator.generate_field_filters(user=user)
     use_field_dictionary = {}
     use_field_dictionary.update({field: search_fields[field] for field in search_fields if field in use_search_fields})
     if field_dictionary:
@@ -93,6 +93,7 @@ def course_discovery_search(search_term=None, size=20, from_=0, field_dictionary
         field_dictionary=use_field_dictionary,
         # show if no enrollment end is provided and has not yet been reached
         filter_dictionary={"enrollment_end": DateRange(datetime.utcnow(), None)},
+        group_filter_dictionary=content_groups_filter,
         exclude_dictionary=exclude_dictionary,
         facet_terms=course_discovery_facets(),
     )

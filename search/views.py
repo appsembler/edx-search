@@ -190,6 +190,7 @@ def course_discovery(request):
 
         results = course_discovery_search(
             search_term=search_term,
+            user=request.user,
             size=size,
             from_=from_,
             field_dictionary=field_dictionary,

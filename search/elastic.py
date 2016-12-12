@@ -139,8 +139,7 @@ def _process_filters(filter_dictionary):
     return [filter_item(field) for field in filter_dictionary]
 
 def _process_group_filters(group_filter_dictionary):
-    """
-    """
+    """Process the user groups, we need only one match for return the course"""
     def groups_filter(field):
         return { "term": { "groups": field }}
 

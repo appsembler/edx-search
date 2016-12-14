@@ -36,7 +36,7 @@ def perform_search(
     """ Call the search engine with the appropriate parameters """
     # field_, filter_ and exclude_dictionary(s) can be overridden by calling application
     # field_dictionary includes course if course_id provided
-    (field_dictionary, filter_dictionary, exclude_dictionary) = SearchFilterGenerator.generate_field_filters(
+    (field_dictionary, filter_dictionary, exclude_dictionary, content_groups_filter) = SearchFilterGenerator.generate_field_filters(
         user=user,
         course_id=course_id
     )

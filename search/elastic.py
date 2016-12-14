@@ -138,6 +138,23 @@ def _process_filters(filter_dictionary):
 
     return [filter_item(field) for field in filter_dictionary]
 
+def _process_group_filters(group_filter_dictionary):
+    """Process the user groups, we need only one match for return the course"""
+    def groups_filter(field):
+        return { "term": { "groups": field }}
+
+    if group_filter_dictionary["groups"]:
+        return [{
+            "bool": {
+            "should": [groups_filter(term) for term in group_filter_dictionary["groups"]]
+          }
+        }]
+    else:
+        return [{
+            "missing": {
+                "field": "groups"
+            }
+        }]
 
 def _process_exclude_dictionary(exclude_dictionary):
     """
@@ -438,6 +455,7 @@ class ElasticSearchEngine(SearchEngine):
                query_string=None,
                field_dictionary=None,
                filter_dictionary=None,
+               group_filter_dictionary=None,
                exclude_dictionary=None,
                facet_terms=None,
                exclude_ids=None,
@@ -559,6 +577,9 @@ class ElasticSearchEngine(SearchEngine):
 
         if filter_dictionary:
             elastic_filters.extend(_process_filters(filter_dictionary))
+
+        if group_filter_dictionary:
+            elastic_filters.extend(_process_group_filters(group_filter_dictionary))
 
         # Support deprecated argument of exclude_ids
         if exclude_ids:

@@ -31,6 +31,10 @@ class SearchFilterGenerator(object):
         """ base implementation which excludes nothing """
         return {}
 
+    def content_groups_filter(self, **kwargs):
+        """ base implementation which returns nothing """
+        return {}
+
     @classmethod
     def generate_field_filters(cls, **kwargs):
         """
@@ -42,4 +46,5 @@ class SearchFilterGenerator(object):
             generator.field_dictionary(**kwargs),
             generator.filter_dictionary(**kwargs),
             generator.exclude_dictionary(**kwargs),
+            generator.content_groups_filter(**kwargs),
         )

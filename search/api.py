@@ -3,6 +3,9 @@ from datetime import datetime
 
 from django.conf import settings
 
+if settings.FEATURES.get('ENABLE_TAXOMAN', False):
+    from taxoman_api.models import Facet
+
 from .filter_generator import SearchFilterGenerator
 from .search_engine_base import SearchEngine
 from .result_processor import SearchResultProcessor
@@ -14,7 +17,11 @@ DEFAULT_FILTER_FIELDS = ["org", "modes", "language"]
 
 def course_discovery_filter_fields():
     """ look up the desired list of course discovery filter fields """
-    return getattr(settings, "COURSE_DISCOVERY_FILTERS", DEFAULT_FILTER_FIELDS)
+    filter_fields = getattr(settings, "COURSE_DISCOVERY_FILTERS", DEFAULT_FILTER_FIELDS)
+    if settings.FEATURES.get('ENABLE_TAXOMAN', False):
+        # Does not check for duplicates
+        filter_fields += list(Facet.objects.all().values_list('slug', flat=True))
+    return filter_fields
 
 
 def course_discovery_facets():

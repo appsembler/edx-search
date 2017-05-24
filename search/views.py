@@ -227,10 +227,13 @@ def course_discovery(request):
         )
 
     if settings.FEATURES.get('ENABLE_TAXOMAN', False):
-        from taxoman_api.api import get_facet_slugs_display_order, get_facet_values_display_order
+        from taxoman_api.api import (
+            get_facet_slugs_display_order,
+            get_facet_values_display_order,
+        )
         slugs_display_order = get_facet_slugs_display_order()
         for slug, display_order in slugs_display_order.iteritems():
-            if results['facets'].has_key(slug):
+            if results.has_key('facets') and results['facets'].has_key(slug):
                 results['facets'][slug]['display_order'] = display_order
                 # collect facet value display order
                 fv_display_orders = get_facet_values_display_order(slug)

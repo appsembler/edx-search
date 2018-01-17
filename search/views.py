@@ -14,6 +14,8 @@ from eventtracking import tracker as track
 from .api import perform_search, course_discovery_search, course_discovery_filter_fields
 from .initializer import SearchInitializer
 
+from .settings import IS_USING_TAXOMAN
+
 # log appears to be standard name used for logger
 log = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -225,6 +227,22 @@ def course_discovery(request):
             request.user.id,
             err
         )
+
+    if IS_USING_TAXOMAN:
+        try:
+            from taxoman_api.api import (
+                get_facet_slugs_display_order,
+                get_facet_values_display_order,
+            )
+            slugs_display_order = get_facet_slugs_display_order()
+            for slug, display_order in slugs_display_order.iteritems():
+                if results.has_key('facets') and results['facets'].has_key(slug):
+                    results['facets'][slug]['display_order'] = display_order
+                    # collect facet value display order
+                    fv_display_orders = get_facet_values_display_order(slug)
+                    results['facets'][slug]['facet_values'] = fv_display_orders
+        except ImportError:
+            log.error('edx-search: "ENABLE_TAXOMAN" set to True, but could not import taxoman_api.')
 
     return HttpResponse(
         json.dumps(results, cls=DjangoJSONEncoder),

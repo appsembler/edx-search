@@ -1,7 +1,21 @@
 """ search business logic implementations """
 from datetime import datetime
+import logging
 
 from django.conf import settings
+
+from .settings import IS_USING_TAXOMAN
+
+logger = logging.getLogger(__name__)
+
+using_taxoman = IS_USING_TAXOMAN
+
+if using_taxoman:
+    try:
+        from taxoman_api.models import Facet
+    except ImportError:
+        logger.error('edx-search: "ENABLE_TAXOMAN" set to True, but could not import taxoman_api.')
+        using_taxoman = False
 
 from .filter_generator import SearchFilterGenerator
 from .search_engine_base import SearchEngine
@@ -14,7 +28,14 @@ DEFAULT_FILTER_FIELDS = ["org", "modes", "language"]
 
 def course_discovery_filter_fields():
     """ look up the desired list of course discovery filter fields """
-    return getattr(settings, "COURSE_DISCOVERY_FILTERS", DEFAULT_FILTER_FIELDS)
+    filter_fields = getattr(settings, "COURSE_DISCOVERY_FILTERS", DEFAULT_FILTER_FIELDS)
+    if using_taxoman:
+        # Does not check for duplicates
+        logger.debug('edx-search using taxoman filter fields')
+        filter_fields += list(Facet.objects.all().values_list('slug', flat=True))
+    else:
+        logger.debug('edx-search NOT using taxoman filter fields')
+    return filter_fields
 
 
 def course_discovery_facets():

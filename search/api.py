@@ -4,6 +4,10 @@ import logging
 
 from django.conf import settings
 
+from .filter_generator import SearchFilterGenerator
+from .search_engine_base import SearchEngine
+from .result_processor import SearchResultProcessor
+from .utils import DateRange
 from .settings import IS_USING_TAXOMAN
 
 logger = logging.getLogger(__name__)
@@ -17,11 +21,6 @@ if using_taxoman:
         logger.error('edx-search: "ENABLE_TAXOMAN" set to True, but could not import taxoman_api.')
         using_taxoman = False
 
-from .filter_generator import SearchFilterGenerator
-from .search_engine_base import SearchEngine
-from .result_processor import SearchResultProcessor
-from .utils import DateRange
-
 # Default filters that we support, override using COURSE_DISCOVERY_FILTERS setting if desired
 DEFAULT_FILTER_FIELDS = ["org", "modes", "language"]
 
@@ -30,8 +29,8 @@ def course_discovery_filter_fields():
     """ look up the desired list of course discovery filter fields """
     filter_fields = getattr(settings, "COURSE_DISCOVERY_FILTERS", DEFAULT_FILTER_FIELDS)
     if using_taxoman:
-        # Does not check for duplicates
         logger.debug('edx-search using taxoman filter fields')
+        # Note: Does not check for duplicates, but these should be unique
         filter_fields += list(Facet.objects.all().values_list('slug', flat=True))
     else:
         logger.debug('edx-search NOT using taxoman filter fields')

@@ -236,7 +236,7 @@ def course_discovery(request):
             )
             slugs_display_order = get_facet_slugs_display_order()
             for slug, display_order in slugs_display_order.iteritems():
-                if results.has_key('facets') and results['facets'].has_key(slug):
+                if 'facets' in results and slug in results['facets']:
                     results['facets'][slug]['display_order'] = display_order
                     # collect facet value display order
                     fv_display_orders = get_facet_values_display_order(slug)
